@@ -46,9 +46,23 @@ function createGrid(cols, rows) {
 function updateGrid() {
   for (let y = rows - 1; y >= 0; y--) {
     for (let x = 0; x < cols; x++) {
-      if (grid[y][x] === 1 && y + 1 < rows && grid[y + 1][x] === 0) {
-        grid[y][x] = 0;
-        grid[y + 1][x] = 1;
+      const currState = grid[y][x];
+
+      if (currState === 1) {
+        // get random pos to fall below left or right.
+        const posBelowRightOrLeft = [1, -1];
+        const randomPos = posBelowRightOrLeft[Math.floor(Math.random() * 2)];
+
+        if (y + 1 < rows && grid[y + 1][x] === 0) {
+          grid[y][x] = 0;
+          grid[y + 1][x] = 1;
+        } else if (y + 1 < rows && grid[y + 1][x + randomPos] === 0) {
+          grid[y][x] = 0;
+          grid[y + 1][x + randomPos] = 1;
+        } else if (y + 1 < rows && grid[y + 1][x - randomPos] === 0) {
+          grid[y][x] = 0;
+          grid[y + 1][x - randomPos] = 1;
+        }
       }
     }
   }
