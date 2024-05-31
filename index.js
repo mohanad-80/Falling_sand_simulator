@@ -60,18 +60,23 @@ function updateGrid() {
     for (let x = 0; x < cols; x++) {
       const currState = grid[y][x];
 
-      if (currState === 1) {
+      if (y + 1 < rows && currState === 1) {
         // get random pos to fall below left or right.
-        const posBelowRightOrLeft = [1, -1];
-        const randomPos = posBelowRightOrLeft[Math.floor(Math.random() * 2)];
+        const randomPos = Math.random() > 0.5 ? 1 : -1;
 
-        if (y + 1 < rows && grid[y + 1][x] === 0) {
+        if (grid[y + 1][x] === 0) {
           grid[y][x] = 0;
           grid[y + 1][x] = 1;
-        } else if (y + 1 < rows && grid[y + 1][x + randomPos] === 0) {
+        } else if (
+          grid[y + 1][x + randomPos] === 0 &&
+          grid[y][x + randomPos] === (Math.random() > 0.1 ? 0 : 1)
+        ) {
           grid[y][x] = 0;
           grid[y + 1][x + randomPos] = 1;
-        } else if (y + 1 < rows && grid[y + 1][x - randomPos] === 0) {
+        } else if (
+          grid[y + 1][x - randomPos] === 0 &&
+          grid[y][x - randomPos] === (Math.random() > 0.1 ? 0 : 1)
+        ) {
           grid[y][x] = 0;
           grid[y + 1][x - randomPos] = 1;
         }
