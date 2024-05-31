@@ -3,7 +3,7 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const width = canvas.width;
 const height = canvas.height;
-const resolution = 10; // Size of each cell
+const resolution = 5; // Size of each cell
 const cols = width / resolution;
 const rows = height / resolution;
 
@@ -33,8 +33,20 @@ canvas.addEventListener("mouseup", () => {
 function addSand(event) {
   const x = Math.floor(event.offsetX / resolution);
   const y = Math.floor(event.offsetY / resolution);
-  if (x >= 0 && x < cols && y >= 0 && y < rows) {
-    grid[y][x] = 1; // Mark the cell as filled with sand
+
+  let brushSize = 5;
+  let extent = Math.floor(brushSize / 2);
+
+  for (let i = y - extent; i <= y + extent; i++) {
+    for (let j = x - extent; j <= x + extent; j++) {
+      if (Math.random() > 0.75) {
+        continue;
+      }
+
+      if (j >= 0 && j < cols && i >= 0 && i < rows) {
+        grid[i][j] = 1; // Mark the cell as filled with sand
+      }
+    }
   }
 }
 
