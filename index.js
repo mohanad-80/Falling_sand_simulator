@@ -43,11 +43,19 @@ function addSand(event) {
         continue;
       }
 
-      if (j >= 0 && j < cols && i >= 0 && i < rows) {
+      if (withinCols(j) && withinRows(i)) {
         grid[i][j] = 1; // Mark the cell as filled with sand
       }
     }
   }
+}
+
+function withinCols(x) {
+  return x >= 0 && x < cols;
+}
+
+function withinRows(y) {
+  return y >= 0 && y < rows;
 }
 
 function createGrid(cols, rows) {
@@ -60,23 +68,26 @@ function updateGrid() {
     for (let x = 0; x < cols; x++) {
       const currState = grid[y][x];
 
-      if (y + 1 < rows && currState === 1) {
-        // get random pos to fall below left or right.
-        const randomPos = Math.random() > 0.5 ? 1 : -1;
+      if (withinRows(y + 1) && currState === 1) {
+        const below = grid[y + 1][x];
 
-        if (grid[y + 1][x] === 0) {
+        // randomly fall below left or right.
+        // also randomly check if the block on the left exist and underneath it is empty then it has the priority to fall down before the current one falls below left. And the same for right.
+        const randomPos = Math.random() > 0.5 ? 1 : -1;
+        const randomDiagonal1 =
+          grid[y + 1][x + randomPos] === 0 &&
+          grid[y][x + randomPos] === 0;
+        const randomDiagonal2 =
+          grid[y + 1][x - randomPos] === 0 &&
+          grid[y][x - randomPos] === 0;
+
+        if (!below) {
           grid[y][x] = 0;
           grid[y + 1][x] = 1;
-        } else if (
-          grid[y + 1][x + randomPos] === 0 &&
-          grid[y][x + randomPos] === (Math.random() > 0.1 ? 0 : 1)
-        ) {
+        } else if (randomDiagonal1) {
           grid[y][x] = 0;
           grid[y + 1][x + randomPos] = 1;
-        } else if (
-          grid[y + 1][x - randomPos] === 0 &&
-          grid[y][x - randomPos] === (Math.random() > 0.1 ? 0 : 1)
-        ) {
+        } else if (randomDiagonal2) {
           grid[y][x] = 0;
           grid[y + 1][x - randomPos] = 1;
         }
