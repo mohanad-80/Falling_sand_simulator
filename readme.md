@@ -28,9 +28,6 @@ Welcome to the Falling Sand Simulator, an interactive physics-based sandbox wher
 2. **Open the HTML File**
    Open `index.html` in your preferred web browser.
 
-3. **GitHub Pages Link**
-   You can access the simulator online at [Falling Sand Simulator](https://github.com/mohanad-80/Falling_sand_simulator.git).
-
 ### How It Works
 
 The simulator uses a grid-based system where each cell in the grid can either be empty or contain a sand particle. The particles follow simple physics rules to fall downward and spread out when encountering obstacles.
@@ -77,7 +74,5 @@ This project is licensed under the MIT License. See the LICENSE file for details
 Feel free to experiment with the Falling Sand Simulator, contribute or suggest improvements.
 
 ---
+
 Enjoy!
-
-
-
