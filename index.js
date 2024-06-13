@@ -6,6 +6,24 @@ const height = canvas.height;
 const resolution = 5; // Size of each cell
 const cols = width / resolution;
 const rows = height / resolution;
+const bgColor = 0;
+class Particle {
+  constructor(color, empty, change) {
+    this.color = color;
+    this.empty = empty ?? true;
+    this.changed = change;
+  }
+
+  isEmpty() {
+    return this.empty;
+  }
+
+  update(color) {
+    this.color = color;
+    this.changed = true;
+    this.empty = color === bgColor ? true : false;
+  }
+}
 
 let grid = createGrid(cols, rows);
 let isMouseDown = false;
@@ -44,7 +62,9 @@ function addSand(event) {
       }
 
       if (withinCols(j) && withinRows(i)) {
-        grid[i][j] = 1; // Mark the cell as filled with sand
+        grid[i][j].color = 1;
+        grid[i][j].changed = true;
+        grid[i][j].empty = false;
       }
     }
   }
@@ -59,37 +79,46 @@ function withinRows(y) {
 }
 
 function createGrid(cols, rows) {
-  const arr = new Array(rows).fill(0).map(() => new Array(cols).fill(0));
+  // const arr = new Array(rows).map(() => new Array(cols));
+  const arr = [];
+  for (let i = 0; i < rows; i++) {
+    arr[i] = [];
+    for (let j = 0; j < cols; j++) {
+      arr[i][j] = new Particle(0, true, true);
+    }
+  }
   return arr;
 }
 
 function updateGrid() {
   for (let y = rows - 1; y >= 0; y--) {
-    for (let x = 0; x < cols; x++) {
-      const currState = grid[y][x];
-
-      if (withinRows(y + 1) && currState === 1) {
-        const below = grid[y + 1][x];
+    for (let x = 0; x < cols; x += Math.random() > 0.25 ? 1 : 2) {
+      const currParticle = grid[y][x];
+      
+      if (withinRows(y + 1) && currParticle.color !== bgColor) {
+        const below = grid[y + 1][x].isEmpty();
 
         // randomly fall below left or right.
         // also randomly check if the block on the left exist and underneath it is empty then it has the priority to fall down before the current one falls below left. And the same for right.
         const randomPos = Math.random() > 0.5 ? 1 : -1;
         const randomDiagonal1 =
-          grid[y + 1][x + randomPos] === 0 &&
-          grid[y][x + randomPos] === 0;
+          withinCols(x + randomPos) &&
+          grid[y + 1][x + randomPos].isEmpty() &&
+          grid[y][x + randomPos].isEmpty();
         const randomDiagonal2 =
-          grid[y + 1][x - randomPos] === 0 &&
-          grid[y][x - randomPos] === 0;
+          withinCols(x - randomPos) &&
+          grid[y + 1][x - randomPos].isEmpty() &&
+          grid[y][x - randomPos].isEmpty();
 
-        if (!below) {
-          grid[y][x] = 0;
-          grid[y + 1][x] = 1;
+        if (below) {
+          grid[y][x].update(0);
+          grid[y + 1][x].update(1);
         } else if (randomDiagonal1) {
-          grid[y][x] = 0;
-          grid[y + 1][x + randomPos] = 1;
+          grid[y][x].update(0);
+          grid[y + 1][x + randomPos].update(1);
         } else if (randomDiagonal2) {
-          grid[y][x] = 0;
-          grid[y + 1][x - randomPos] = 1;
+          grid[y][x].update(0);
+          grid[y + 1][x - randomPos].update(1);
         }
       }
     }
@@ -97,12 +126,12 @@ function updateGrid() {
 }
 
 function renderGrid() {
-  ctx.clearRect(0, 0, width, height); // clear canvas
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
-      if (grid[y][x] === 1) {
-        ctx.fillStyle = "white";
+      if (grid[y][x].changed) {
+        ctx.fillStyle = grid[y][x].color ? "#fff" : "#000";
         ctx.fillRect(x * resolution, y * resolution, resolution, resolution);
+        grid[y][x].changed = false;
       }
     }
   }
