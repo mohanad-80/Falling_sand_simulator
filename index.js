@@ -7,11 +7,13 @@ const resolution = 5; // Size of each cell
 const cols = width / resolution;
 const rows = height / resolution;
 const bgColor = 0;
+const velocityIncrementFactor = 0.2;
 class Particle {
   constructor(color, empty, change) {
     this.color = color;
     this.empty = empty ?? true;
     this.changed = change;
+    this.velocity = 0;
   }
 
   isEmpty() {
@@ -22,6 +24,7 @@ class Particle {
     this.color = color;
     this.changed = true;
     this.empty = color === bgColor ? true : false;
+    this.velocity += velocityIncrementFactor;
   }
 }
 
@@ -62,9 +65,7 @@ function addSand(event) {
       }
 
       if (withinCols(j) && withinRows(i)) {
-        grid[i][j].color = 1;
-        grid[i][j].changed = true;
-        grid[i][j].empty = false;
+        grid[i][j].update(1);
       }
     }
   }
@@ -79,7 +80,6 @@ function withinRows(y) {
 }
 
 function createGrid(cols, rows) {
-  // const arr = new Array(rows).map(() => new Array(cols));
   const arr = [];
   for (let i = 0; i < rows; i++) {
     arr[i] = [];
@@ -92,11 +92,21 @@ function createGrid(cols, rows) {
 
 function updateGrid() {
   for (let y = rows - 1; y >= 0; y--) {
-    for (let x = 0; x < cols; x += Math.random() > 0.25 ? 1 : 2) {
+    for (let x = 0; x < cols; x += Math.random() > 0.2 ? 1 : 2) {
       const currParticle = grid[y][x];
-      
+      const currVelocity = grid[y][x].velocity;
+
       if (withinRows(y + 1) && currParticle.color !== bgColor) {
-        const below = grid[y + 1][x].isEmpty();
+        let fallPos = Math.ceil(currParticle.velocity);
+
+        while (
+          fallPos > 1 &&
+          (!withinRows(y + fallPos) || grid[y + fallPos][x].color !== bgColor)
+        ) {
+          fallPos -= 1;
+        }
+
+        const below = grid[y + fallPos][x].isEmpty();
 
         // randomly fall below left or right.
         // also randomly check if the block on the left exist and underneath it is empty then it has the priority to fall down before the current one falls below left. And the same for right.
@@ -110,14 +120,20 @@ function updateGrid() {
           grid[y + 1][x - randomPos].isEmpty() &&
           grid[y][x - randomPos].isEmpty();
 
+        if (!below && !randomDiagonal1 && !randomDiagonal2) {
+          continue;
+        }
+
+        grid[y][x].velocity = 0;
+        grid[y][x].update(0);
         if (below) {
-          grid[y][x].update(0);
-          grid[y + 1][x].update(1);
+          grid[y + fallPos][x].velocity = currVelocity;
+          grid[y + fallPos][x].update(1);
         } else if (randomDiagonal1) {
-          grid[y][x].update(0);
+          grid[y + 1][x + randomPos].velocity = 0;
           grid[y + 1][x + randomPos].update(1);
         } else if (randomDiagonal2) {
-          grid[y][x].update(0);
+          grid[y + 1][x - randomPos].velocity = 0;
           grid[y + 1][x - randomPos].update(1);
         }
       }
