@@ -1,9 +1,47 @@
 body {
   background-color: #343434;
+  color: #fff;
+  text-align: center;
+}
+
+.body {
   display: flex;
   justify-content: center;
+  gap: 10px;
 }
 
 #canvas {
   background-color: #000;
+  cursor: pointer;
+}
+
+.control-panel {
+  min-width: 300px;
+  outline: 1px solid #aaa;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  /* align-items: center; */
+}
+
+#color-picker {
+  background-color: transparent;
+  border-radius: 5px;
+}
+
+hr {
+  margin: 10px;
+  background-color: #000;
+}
+
+label[for=brush-size] {
+  padding: 0 5px;
+}
+
+.footer {
+  padding-top: 50px;
+}
+
+a {
+  color: white;
 }
